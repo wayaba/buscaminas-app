@@ -1,3 +1,5 @@
+import { Footer } from '@/components/Footer'
+import { Header } from '@/components/Header'
 import { useState, useEffect } from 'react'
 
 const NUM_MINES = 10
@@ -32,9 +34,9 @@ export default function Home() {
   function placeMines(newBoard) {
     let mines = 0
     while (mines < NUM_MINES) {
-      let row = Math.floor(Math.random() * BOARD_SIZE)
-      let col = Math.floor(Math.random() * BOARD_SIZE)
-      let cell = newBoard.find(
+      const row = Math.floor(Math.random() * BOARD_SIZE)
+      const col = Math.floor(Math.random() * BOARD_SIZE)
+      const cell = newBoard.find(
         (cell) => cell.row === row && cell.col === col && cell.isMine !== true
       )
       if (cell) {
@@ -147,25 +149,27 @@ export default function Home() {
     }
   }
 
+  const TEXT_COLORS = {
+    1: 'text-blue-800',
+    2: 'text-green-800',
+    3: 'text-red-800',
+    4: 'text-yellow-800'
+  }
+
   function renderBoard() {
     return (
       <div className="grid grid-cols-8 sm:grid-cols-8  m-auto w-fit">
         {board.map((cell, i) => {
           let content = ''
-          let textColor = 'text-blue-800'
+          let textColor = ''
           if (cell.isCovered) {
-            if (cell.isFlagged) {
-              content = 'F'
-            }
+            if (cell.isFlagged) content = '🚩'
           } else {
             if (cell.isMine) {
-              content = 'M'
-            } else if (cell.adjacentMines > 0) {
-              content = cell.adjacentMines
-              if (content === 2) textColor = 'text-green-800'
-
-              if (content === 3) textColor = 'text-red-800'
-              if (content === 4) textColor = 'text-yellow-800'
+              content = '💣'
+            } else {
+              content = cell.adjacentMines > 0 ? cell.adjacentMines : ''
+              textColor = TEXT_COLORS[content]
             }
           }
 
@@ -194,12 +198,22 @@ export default function Home() {
 
   return (
     <main className="grid h-screen place-content-center bg-slate-900">
-      <h1>Buscaminas</h1>
-      <section className="gird grid-cols-1 m-4">{renderBoard()}</section>
-      <button onClick={generateBoard}>Nuevo juego</button>
-      {gameOver && (
-        <div className="message">{win ? 'Ganaste!' : 'Perdiste!'}</div>
-      )}
+      <Header title="Buscaminas" />
+      <section className="gird grid-cols-1 m-4">
+        {renderBoard()}
+        <div className="text-center m-4">
+          <button
+            className="border rounded-lg hover:bg-slate-500 p-2 bg-slate-700 m-auto"
+            onClick={generateBoard}
+          >
+            Nuevo juego
+          </button>
+          {gameOver && (
+            <div className="message">{win ? 'Ganaste!' : 'Perdiste!'}</div>
+          )}
+        </div>
+      </section>
+      <Footer author="Pablo Pedraza" github="wayaba" />
     </main>
   )
 }
